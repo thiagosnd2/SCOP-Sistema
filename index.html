@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SCOP — Sistema de Controle de Obras Públicas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f5f2; --panel:#ffffff; --ink:#1d2421; --muted:#5f6b66; --line:#dfe3df;
+  --brand:#1f4d3f; --brand-2:#2f6f5a; --accent:#c8862a;
+  --crit:#b3261e; --crit-bg:#fbeceb; --warn:#9a6200; --warn-bg:#fdf3e1; --ok:#22704a; --ok-bg:#e7f4ec; --info:#2b5c8a; --info-bg:#e8f0f8;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:14px;line-height:1.45}
+button,input,select,textarea{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+aside{background:var(--brand);color:#e9f1ed;padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+.logo{font-weight:700;font-size:18px;letter-spacing:.5px;padding:0 8px 2px}
+.logo small{display:block;font-weight:400;font-size:11.5px;opacity:.75;letter-spacing:0;margin-top:2px}
+.nav{margin-top:18px;display:flex;flex-direction:column;gap:2px}
+.nav button{all:unset;cursor:pointer;padding:9px 10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
+.nav button:hover{background:rgba(255,255,255,.08)}
+.nav button.on{background:rgba(255,255,255,.16);font-weight:600}
+.pill{font-size:11px;background:var(--crit);color:#fff;border-radius:99px;padding:1px 7px;font-weight:600}
+.side-foot{margin-top:auto;font-size:11.5px;opacity:.8;padding:0 8px}
+main{padding:24px 28px 60px;max-width:1280px;width:100%}
+h1{font-size:22px;margin:0 0 4px}
+h2{font-size:16px;margin:0 0 12px}
+h3{font-size:14px;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 18px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:500}
+.btn:hover{border-color:#b9c2bd}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{background:var(--brand-2)}
+.btn.sm{padding:4px 9px;font-size:12.5px}
+.btn.danger{color:var(--crit)}
+.grid{display:grid;gap:14px}
+.k4{grid-template-columns:repeat(4,1fr)}
+.k2{grid-template-columns:1fr 1fr}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.kpi .l{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+.kpi .v{font-size:22px;font-weight:700;margin-top:4px;font-family:"IBM Plex Mono",monospace}
+.kpi .h{font-size:12px;color:var(--muted);margin-top:2px}
+table{width:100%;border-collapse:collapse}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);text-align:left;font-weight:600;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.click{cursor:pointer}
+tr.click:hover td{background:#f8faf8}
+.num{text-align:right;font-family:"IBM Plex Mono",monospace;white-space:nowrap}
+.tag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:6px;padding:2px 7px;white-space:nowrap}
+.t-crit{background:var(--crit-bg);color:var(--crit)}
+.t-warn{background:var(--warn-bg);color:var(--warn)}
+.t-ok{background:var(--ok-bg);color:var(--ok)}
+.t-info{background:var(--info-bg);color:var(--info)}
+.t-mute{background:#eef0ee;color:var(--muted)}
+.bar{height:7px;background:#e8ebe8;border-radius:9px;position:relative;overflow:hidden;min-width:90px}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--brand-2);border-radius:9px}
+.bar b{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--accent)}
+.alert{display:flex;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:8px;align-items:flex-start}
+.alert.crit{background:var(--crit-bg)} .alert.warn{background:var(--warn-bg)} .alert.info{background:var(--info-bg)}
+.alert .ic{font-weight:700;width:18px;flex:none}
+.alert.crit .ic{color:var(--crit)} .alert.warn .ic{color:var(--warn)} .alert.info .ic{color:var(--info)}
+.alert .base{font-size:12px;color:var(--muted);margin-top:2px}
+.alert .ob{font-size:12px;font-weight:600}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:16px 0}
+.tabs button{all:unset;cursor:pointer;padding:9px 14px;border-bottom:2px solid transparent;color:var(--muted);font-weight:500}
+.tabs button.on{border-color:var(--brand);color:var(--ink);font-weight:600}
+.form{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 14px}
+.form .full{grid-column:1/-1}
+.form .two{grid-column:span 2}
+label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted);font-weight:500}
+input,select,textarea{border:1px solid var(--line);border-radius:7px;padding:7px 9px;background:#fff;color:var(--ink);font-size:13.5px}
+input:focus,select:focus,textarea:focus{outline:2px solid #b7d3c6;border-color:var(--brand-2)}
+textarea{min-height:64px;resize:vertical}
+fieldset{border:1px solid var(--line);border-radius:var(--r);padding:12px 14px 14px;margin:0 0 14px}
+legend{font-weight:600;font-size:13px;padding:0 6px}
+.ck{display:grid;grid-template-columns:26px 1fr auto;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);align-items:start}
+.ck input[type=checkbox]{width:17px;height:17px;margin-top:2px;accent-color:var(--brand)}
+.ck .t{font-weight:500}
+.ck .b{font-size:12px;color:var(--muted)}
+.ck.na{opacity:.45}
+.phase{margin-bottom:18px}
+.phase h3{display:flex;gap:8px;align-items:center}
+.modal-bg{position:fixed;inset:0;background:rgba(20,28,25,.45);display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:50;overflow:auto}
+.modal{background:#fff;border-radius:12px;max-width:980px;width:100%;padding:22px}
+.banner{background:var(--warn-bg);color:var(--warn);padding:8px 12px;border-radius:8px;margin-bottom:14px;font-size:13px}
+.empty{text-align:center;padding:40px 10px;color:var(--muted)}
+.req li{margin-bottom:6px}
+.req .base{color:var(--muted);font-size:12px}
+.mini{font-size:12px;color:var(--muted)}
+.law{padding:10px 0;border-bottom:1px solid var(--line)}
+.law b{display:block}
+.toast{position:fixed;bottom:18px;right:18px;background:var(--ink);color:#fff;padding:10px 14px;border-radius:8px;font-size:13px;z-index:60}
+svg text{font-family:"IBM Plex Sans",sans-serif}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{position:static;height:auto}
+  .k4{grid-template-columns:1fr 1fr}
+  .k2,.form{grid-template-columns:1fr}
+  .form .two{grid-column:auto}
+  main{padding:18px 14px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="logo">SCOP<small>Controle de Obras Públicas</small></div>
+    <div class="nav" id="nav"></div>
+    <div class="side-foot" id="sync">Conectando ao banco…</div>
+  </aside>
+  <main id="main"></main>
+</div>
+<div id="modal"></div>
+<script>
+/* ===================== Parâmetros legais ===================== */
+const PARAM = {
+  ano: 2026,
+  decreto: "Decreto nº 12.807/2025",
+  dispensaObras: 130984.20,       // Lei 14.133, art. 75, I
+  grandeVulto: 261968421.04,      // Lei 14.133, art. 6º, XXII
+  faixaMedia: 5000000,            // parâmetro interno (ajustável) para separar médio/grande porte
+};
+const STATUS = [
+  ["planejamento","Planejamento",0],["licitacao","Licitação / Contratação direta",1],["contratada","Contratada (pré-OS)",2],
+  ["execucao","Em execução",3],["paralisada","Paralisada",3],["recebimento_provisorio","Recebimento provisório",4],["concluida","Concluída",5]
+];
+const stIdx = s => (STATUS.find(x=>x[0]===s)||[0,0,0])[2];
+const stLabel = s => (STATUS.find(x=>x[0]===s)||[0,s])[1];
+const TIPOS = [["edificacao","Edificação (construção nova)"],["reforma_edificio","Reforma de edifício ou equipamento"],["pavimentacao","Pavimentação / vias"],["saneamento","Saneamento (água/esgoto)"],["drenagem","Drenagem / contenção"],["ponte","Ponte / viaduto / OAE"],["iluminacao","Iluminação / elétrica"],["outro","Outro serviço de engenharia"]];
+const REGIMES = [["unitario","Empreitada por preço unitário"],["global","Empreitada por preço global"],["integral","Empreitada integral"],["tarefa","Contratação por tarefa"],["integrada","Contratação integrada"],["semi","Contratação semi-integrada"],["fornecimento","Fornecimento e prestação de serviço associado"]];
+const MODALIDADES = [["concorrencia","Concorrência"],["pregao","Pregão (serviço comum de engenharia)"],["dialogo","Diálogo competitivo"],["dispensa","Dispensa de licitação"],["inexigibilidade","Inexigibilidade"],["rdp","Registro de preços"]];
+const FONTES = [["proprio","Recursos próprios"],["convenio_federal","Transferência federal (convênio/contrato de repasse)"],["convenio_estadual","Transferência estadual"],["financiamento","Operação de crédito / financiamento"]];
+const ESFERAS = [["municipal","Municipal"],["estadual","Estadual"],["federal","Federal"]];
+const lbl = (arr,v) => (arr.find(x=>x[0]===v)||[0,"—"])[1];
+
+/* ===================== Utilidades ===================== */
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const brl = v => (Number(v)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const pct = v => (isFinite(v)? v:0).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
+const num = v => { const n = parseFloat(String(v??"").replace(/\./g,"").replace(",",".")); return isFinite(n)? n : 0; };
+const numIn = v => { if (v===""||v==null) return 0; const s=String(v); return s.includes(",")? num(s) : (parseFloat(s)||0); };
+const D = s => { if(!s) return null; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); };
+const today = () => { const t=new Date(); return new Date(t.getFullYear(),t.getMonth(),t.getDate()); };
+const addDays = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+const diffDays = (a,b) => Math.round((b-a)/86400000);
+const fmtD = d => d ? d.toLocaleDateString("pt-BR") : "—";
+const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const addBusiness = (d,n) => { let x=new Date(d), c=0; while(c<n){ x.setDate(x.getDate()+1); const w=x.getDay(); if(w!==0&&w!==6) c++; } return x; };
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36)+Math.random().toString(36).slice(2))).replace(/[^a-zA-Z0-9-]/g,"");
+
+/* ===================== Estado e persistência ===================== */
+const state = { obras:{}, view: location.hash.slice(1)||"painel", obraId:null, tab:"resumo", dbMode:"loading" };
+let db = null; const queues = {};
+function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2600); }
+function localLoad(){ try{ const s=localStorage.getItem("scop_obras"); if(s) state.obras=JSON.parse(s); }catch(e){} }
+function localSave(){ try{ localStorage.setItem("scop_obras", JSON.stringify(state.obras)); }catch(e){} }
+
+function persist(o){
+  o.atualizadoEm = new Date().toISOString();
+  state.obras[o.id] = o; render();
+  if (db){
+    const body = JSON.parse(JSON.stringify(o)); delete body.id;
+    queues[o.id] = (queues[o.id]||Promise.resolve()).then(()=>db.collection("obras").doc(o.id).set(body)).catch(e=>{
+      toast(e && e.code==="quota_exceeded" ? "Limite de armazenamento atingido." : "Não foi possível salvar agora. Tente novamente.");
+    });
+  } else localSave();
+}
+function removeObra(id){
+  delete state.obras[id];
+  if (db) queues[id]=(queues[id]||Promise.resolve()).then(()=>db.collection("obras").doc(id).delete()).catch(()=>toast("Falha ao excluir."));
+  else localSave();
+  go("obras");
+}
+
+async function initDb(){
+  let timer = setTimeout(()=>{ if(state.dbMode==="loading"){ document.getElementById("sync").textContent="Banco ainda não respondeu — dados podem estar desatualizados."; } },10000);
+  try{ db = await window.claude?.use?.("db"); }catch(e){ db=null; }
+  if(!db){ clearTimeout(timer); state.dbMode="local"; localLoad(); setSync(); render(); return; }
+  db.collection("obras").onSnapshot(snap=>{
+    const m={}; snap.docs.forEach(d=>{ if(d.exists){ m[d.id]=Object.assign(JSON.parse(JSON.stringify(d.data())),{id:d.id}); } });
+    state.obras=m;
+    if(!snap.metadata.fromCache){ clearTimeout(timer); state.dbMode="db"; }
+    setSync(); render();
+  }, err=>{ clearTimeout(timer); state.dbMode="erro"; setSync(); render(); });
+}
+function setSync(){
+  const el=document.getElementById("sync");
+  el.textContent = state.dbMode==="db" ? "● Dados salvos e compartilhados" : state.dbMode==="local" ? "Modo local (neste navegador)" : state.dbMode==="erro" ? "Banco indisponível no momento" : "Conectando ao banco…";
+}
+
+/* ===================== Regras de negócio ===================== */
+function valorBase(o){ return numIn(o.valorContratado)||numIn(o.valorEstimado); }
+function porte(o){
+  const v = valorBase(o);
+  if (v>=PARAM.grandeVulto) return {k:"vulto",t:"Grande vulto",c:"t-crit",d:`≥ ${brl(PARAM.grandeVulto)} (art. 6º, XXII)`};
+  if (v>PARAM.faixaMedia) return {k:"grande",t:"Grande porte",c:"t-warn",d:`> ${brl(PARAM.faixaMedia)} (parâmetro interno)`};
+  if (v>PARAM.dispensaObras) return {k:"medio",t:"Médio porte",c:"t-info",d:`entre o limite de dispensa e ${brl(PARAM.faixaMedia)}`};
+  return {k:"pequeno",t:"Pequeno porte",c:"t-ok",d:`≤ ${brl(PARAM.dispensaObras)} (faixa de dispensa, art. 75, I)`};
+}
+function financeiro(o){
+  const orig = numIn(o.valorContratado)||numIn(o.valorEstimado);
+  const ad = o.aditivos||[];
+  const acr = ad.filter(a=>a.tipo==="acrescimo").reduce((s,a)=>s+numIn(a.valor),0);
+  const sup = ad.filter(a=>a.tipo==="supressao").reduce((s,a)=>s+numIn(a.valor),0);
+  const reaj = ad.filter(a=>a.tipo==="reajuste").reduce((s,a)=>s+numIn(a.valor),0);
+  const atual = orig + acr - sup + reaj;
+  const meds = (o.medicoes||[]).slice().sort((a,b)=>(a.fim||"").localeCompare(b.fim||""));
+  const medido = meds.reduce((s,m)=>s+numIn(m.valor),0);
+  const fisico = meds.length ? numIn(meds[meds.length-1].fisico) : 0;
+  const limite = o.tipo==="reforma_edificio" ? 50 : 25;
+  return {orig, acr, sup, reaj, atual, medido, saldo: atual-medido, pFin: atual? medido/atual*100 : 0, fisico, meds,
+    pAcr: orig? acr/orig*100 : 0, pSup: orig? sup/orig*100 : 0, limite};
+}
+function prazo(o){
+  const ini = D(o.dataOS); const extra = (o.aditivos||[]).filter(a=>a.tipo==="prazo").reduce((s,a)=>s+numIn(a.dias),0);
+  const total = numIn(o.prazoDias)+extra;
+  if(!ini||!total) return {ini, total, fim:null, restante:null, previsto:null, extra};
+  const fim = addDays(ini,total); const t=today();
+  const decorrido = Math.max(0,Math.min(total,diffDays(ini,t)));
+  return {ini, total, extra, fim, restante: diffDays(t,fim), previsto: decorrido/total*100};
+}
+function isDireta(o){ return o.modalidade==="dispensa"||o.modalidade==="inexigibilidade"; }
+function exigeLic(o){ return o.licenca!=="nao"; }
+
+const CHECK = [
+  // fase 0 — planejamento
+  {k:"dfd",f:0,t:"Documento de formalização da demanda (DFD)",b:"Lei 14.133/2021, art. 12, VII e art. 72, I"},
+  {k:"etp",f:0,t:"Estudo Técnico Preliminar (ETP)",b:"Lei 14.133/2021, art. 18, I e § 1º",c:1},
+  {k:"pb",f:0,t:"Projeto básico (ou anteprojeto, na contratação integrada)",b:"Lei 14.133/2021, art. 6º, XXIV e XXV; art. 46, § 2º",c:1},
+  {k:"pe",f:0,t:"Projeto executivo (ou previsão de elaboração pela contratada)",b:"Lei 14.133/2021, art. 46, § 1º",c:1},
+  {k:"orc",f:0,t:"Orçamento de referência (SINAPI/SICRO), BDI e encargos sociais detalhados",b:"Lei 14.133/2021, art. 23, § 2º; Decreto 7.983/2013 (recursos federais)",c:1},
+  {k:"art_proj",f:0,t:"ART/RRT de projeto e de orçamento",b:"Lei 6.496/1977 (CREA); Lei 12.378/2010 (CAU)",c:1},
+  {k:"matriz",f:0,t:"Matriz de riscos",b:"Lei 14.133/2021, art. 22, § 3º (obrigatória em grande vulto, integrada e semi-integrada)",c:1,a:o=>porte(o).k==="vulto"||o.regime==="integrada"||o.regime==="semi"},
+  {k:"lic_amb",f:0,t:"Licença prévia / manifestação ambiental antes do edital",b:"Lei 14.133/2021, art. 115, § 4º; Lei 6.938/1981; Res. CONAMA 237/1997; LC 140/2011",c:1,a:exigeLic},
+  {k:"terreno",f:0,t:"Titularidade ou posse regular da área; desapropriações resolvidas",b:"Lei 14.133/2021, art. 25, § 5º",c:1},
+  {k:"dotacao",f:0,t:"Dotação orçamentária e adequação fiscal (estimativa de impacto)",b:"Lei 14.133/2021, art. 150; LC 101/2000, arts. 16 e 45; Lei 4.320/1964",c:1},
+  {k:"alvara",f:0,t:"Alvará / licença municipal de construção",b:"Código de Obras e Plano Diretor municipais; Lei 10.257/2001"},
+  {k:"acess",f:0,t:"Acessibilidade prevista em projeto (NBR 9050)",b:"Lei 13.146/2015; Lei 14.133/2021, art. 45, VI"},
+  // fase 1 — licitação
+  {k:"edital",f:1,t:"Edital (ou processo de contratação direta) com critérios de medição e pagamento",b:"Lei 14.133/2021, arts. 25 e 72",c:1},
+  {k:"parecer",f:1,t:"Parecer jurídico",b:"Lei 14.133/2021, art. 53",c:1},
+  {k:"pncp_edital",f:1,t:"Divulgação no PNCP (edital ou ato de contratação direta)",b:"Lei 14.133/2021, arts. 54, 72 (par. único) e 174",c:1},
+  {k:"homolog",f:1,t:"Adjudicação e homologação",b:"Lei 14.133/2021, art. 71",a:o=>!isDireta(o)},
+  // fase 2 — contratação
+  {k:"contrato",f:2,t:"Contrato assinado com as cláusulas obrigatórias",b:"Lei 14.133/2021, art. 92",c:1},
+  {k:"pncp_contrato",f:2,t:"Publicação do contrato no PNCP (condição de eficácia)",b:"Lei 14.133/2021, art. 94 — 20 dias úteis (licitação) / 10 dias úteis (contratação direta)",c:1},
+  {k:"garantia",f:2,t:"Garantia contratual apresentada (se exigida no edital)",b:"Lei 14.133/2021, arts. 96 a 99"},
+  {k:"design",f:2,t:"Designação formal do gestor e do(s) fiscal(is)",b:"Lei 14.133/2021, arts. 7º e 117",c:1},
+  {k:"art_exec",f:2,t:"ART/RRT de execução da contratada",b:"Lei 6.496/1977; Lei 12.378/2010",c:1},
+  {k:"art_fisc",f:2,t:"ART/RRT de fiscalização",b:"Lei 6.496/1977; Lei 12.378/2010",c:1},
+  {k:"os",f:2,t:"Ordem de serviço emitida",b:"Contrato / regulamento do órgão",c:1},
+  {k:"cno",f:2,t:"Inscrição da obra no CNO (Receita Federal)",b:"IN RFB nº 2.061/2021"},
+  {k:"placa",f:2,t:"Placa da obra no padrão do órgão / concedente",b:"Manual de identidade do órgão ou do concedente"},
+  {k:"integridade",f:2,t:"Programa de integridade da contratada em até 6 meses",b:"Lei 14.133/2021, art. 25, § 4º",c:1,a:o=>porte(o).k==="vulto"},
+  {k:"transferegov",f:2,t:"Registro e acompanhamento no Transferegov",b:"Decreto 11.531/2023",c:1,a:o=>o.fonte==="convenio_federal"},
+  {k:"cipi",f:2,t:"Cadastro no CIPI (projetos de investimento com recurso federal)",b:"Decreto 10.496/2020",a:o=>o.fonte==="convenio_federal"},
+  // fase 3 — execução
+  {k:"diario_ok",f:3,t:"Diário de obra com registro das ocorrências pelo fiscal",b:"Lei 14.133/2021, art. 117, § 1º",c:1},
+  {k:"medicao_ok",f:3,t:"Medições com memória de cálculo e atesto do fiscal",b:"Lei 14.133/2021, arts. 117 e 145 (vedado pagamento antecipado)",c:1},
+  {k:"controle",f:3,t:"Ensaios de controle tecnológico (concreto, solo, asfalto)",b:"Normas ABNT aplicáveis"},
+  {k:"nr18",f:3,t:"Segurança do trabalho no canteiro (PGR)",b:"NR-18 e NR-01 (MTE)"},
+  {k:"lic_inst",f:3,t:"Licença de instalação vigente",b:"Res. CONAMA 237/1997",c:1,a:exigeLic},
+  {k:"tce",f:3,t:"Remessas ao Tribunal de Contas em dia",b:o=>o.uf==="ES"?"TCE-ES — sistema CidadES (IN TCE-ES nº 68/2020)":"Instruções normativas do Tribunal de Contas do Estado",c:1},
+  // fase 4 — recebimento
+  {k:"rec_prov",f:4,t:"Termo de recebimento provisório (até 15 dias da comunicação da contratada)",b:"Lei 14.133/2021, art. 140, I, a",c:1},
+  {k:"rec_def",f:4,t:"Termo de recebimento definitivo (servidor ou comissão)",b:"Lei 14.133/2021, art. 140, I, b",c:1},
+  {k:"asbuilt",f:4,t:"As built, manuais e garantias de equipamentos entregues",b:"Contrato / termo de referência"},
+  {k:"habite",f:4,t:"Habite-se / auto de conclusão",b:"Código de Obras municipal",a:o=>o.tipo==="edificacao"||o.tipo==="reforma_edificio"},
+  {k:"lic_op",f:4,t:"Licença de operação (quando cabível)",b:"Res. CONAMA 237/1997",a:exigeLic},
+  {k:"prestacao",f:4,t:"Prestação de contas da transferência",b:"Termo de convênio; Decreto 11.531/2023 (federal)",c:1,a:o=>o.fonte==="convenio_federal"||o.fonte==="convenio_estadual"},
+];
+const FASES = ["Planejamento","Licitação","Contratação","Execução","Recebimento"];
+const aplica = (it,o) => !it.a || it.a(o);
+const baseTxt = (it,o) => typeof it.b==="function" ? it.b(o) : it.b;
+const ckOk = (o,k) => !!(o.checklist && o.checklist[k] && o.checklist[k].ok);
+
+function conformidade(o){
+  const its = CHECK.filter(i=>aplica(i,o)); const s=stIdx(o.status);
+  const devidos = its.filter(i=>i.f < s || (i.f===s && s<3));
+  const ok = its.filter(i=>ckOk(o,i.k)).length;
+  const atrasados = its.filter(i=>i.f < s && !ckOk(o,i.k));
+  return {total:its.length, ok, devidos:devidos.length, devOk:devidos.filter(i=>ckOk(o,i.k)).length, atrasados};
+}
+
+function alertas(o){
+  const A=[]; const add=(n,m,b)=>A.push({n,m,b,obra:o});
+  const s=stIdx(o.status); const p=prazo(o); const f=financeiro(o); const P=porte(o); const t=today();
+  if (s>=2){
+    if(!o.fiscal||!o.gestor) add("crit","Gestor e/ou fiscal do contrato não designados.","Lei 14.133/2021, art. 117");
+    if(!o.artExec) add("crit","ART/RRT de execução da contratada não informada.","Lei 6.496/1977");
+    if(!o.artFisc) add("crit","ART/RRT de fiscalização não informada.","Lei 6.496/1977");
+    if(!ckOk(o,"pncp_contrato") && o.dataAssinatura){
+      const lim = addBusiness(D(o.dataAssinatura), isDireta(o)?10:20);
+      if (t>lim) add("crit",`Contrato sem publicação no PNCP — prazo venceu em ${fmtD(lim)}. Sem publicação o contrato não tem eficácia.`,"Lei 14.133/2021, art. 94");
+      else add("warn",`Publicar o contrato no PNCP até ${fmtD(lim)} (dias úteis, sem feriados).`,"Lei 14.133/2021, art. 94");
+    }
+  }
+  if (s===3 && o.status==="execucao"){
+    if(!o.dataOS) add("warn","Obra em execução sem data de ordem de serviço.","Contrato");
+    if(p.fim){
+      if(p.restante<0) add("crit",`Prazo de execução expirado em ${fmtD(p.fim)} (${-p.restante} dias). Formalizar prorrogação justificada ou apurar mora da contratada.`,"Lei 14.133/2021, arts. 107, 111 e 155");
+      else if(p.restante<=30) add("warn",`Prazo de execução termina em ${p.restante} dias (${fmtD(p.fim)}).`,"Lei 14.133/2021, art. 111");
+    }
+    if(p.previsto!=null && f.meds.length){
+      const gap = p.previsto - f.fisico;
+      if(gap>20) add("crit",`Atraso físico relevante: ${pct(f.fisico)} executado contra ${pct(p.previsto)} previsto (linear).`,"Cronograma físico-financeiro");
+      else if(gap>10) add("warn",`Atraso físico: ${pct(f.fisico)} executado contra ${pct(p.previsto)} previsto (linear).`,"Cronograma físico-financeiro");
+    }
+    const last = f.meds.length ? D(f.meds[f.meds.length-1].fim) : D(o.dataOS);
+    if(last && diffDays(last,t)>35) add("warn",`Sem medição há ${diffDays(last,t)} dias.`,"Contrato — periodicidade de medição");
+    const dlast = (o.diario||[]).map(x=>x.data).sort().pop();
+    const dref = dlast ? D(dlast) : D(o.dataOS);
+    if(dref && diffDays(dref,t)>7) add("warn",`Diário de obra sem registro há ${diffDays(dref,t)} dias.`,"Lei 14.133/2021, art. 117, § 1º");
+  }
+  if (f.meds.length && f.pFin > f.fisico + 5) add("crit",`Financeiro (${pct(f.pFin)}) à frente do físico (${pct(f.fisico)}): risco de pagamento antecipado.`,"Lei 14.133/2021, art. 145");
+  if (f.pAcr > f.limite) add("crit",`Acréscimos somam ${pct(f.pAcr)} do valor inicial — acima do limite de ${f.limite}%.`,"Lei 14.133/2021, art. 125");
+  else if (f.pAcr > f.limite*0.8) add("warn",`Acréscimos em ${pct(f.pAcr)} do valor inicial (limite ${f.limite}%).`,"Lei 14.133/2021, art. 125");
+  if (f.pSup > 25) add("crit",`Supressões somam ${pct(f.pSup)} — acima de 25% do valor inicial. Verificar fundamento e concordância da contratada.`,"Lei 14.133/2021, arts. 124 e 125");
+  if (f.medido > f.atual && f.atual>0) add("crit","Valor medido supera o valor atualizado do contrato.","Lei 14.133/2021, art. 145");
+  if (o.status==="paralisada"){
+    const dp = D(o.dataParalisacao);
+    if(!dp) add("warn","Obra paralisada sem data de paralisação registrada.","Lei 14.133/2021, art. 115, § 6º");
+    else if(diffDays(dp,t)>30) add("crit",`Paralisada há ${diffDays(dp,t)} dias: divulgar aviso de obra paralisada (site oficial e placa no local) com motivo, responsável e data prevista de reinício.`,"Lei 14.133/2021, art. 115, § 6º");
+  }
+  if (o.garantiaVenc && s>=2 && s<5){
+    const gv=D(o.garantiaVenc); const r=diffDays(t,gv);
+    if(r<0) add("crit",`Garantia contratual vencida em ${fmtD(gv)}.`,"Lei 14.133/2021, arts. 96 a 98");
+    else if(r<=30) add("warn",`Garantia contratual vence em ${r} dias.`,"Lei 14.133/2021, arts. 96 a 98");
+  }
+  if (P.k==="vulto" && s>=2 && !ckOk(o,"integridade") && o.dataAssinatura){
+    const lim = addDays(D(o.dataAssinatura),182);
+    add(t>lim?"crit":"warn",`Programa de integridade da contratada: prazo até ${fmtD(lim)}.`,"Lei 14.133/2021, art. 25, § 4º");
+  }
+  const c = conformidade(o);
+  const crit = c.atrasados.filter(i=>i.c);
+  if (crit.length) add("crit",`${crit.length} exigência(s) obrigatória(s) de fases anteriores sem comprovação: ${crit.slice(0,3).map(i=>i.t).join("; ")}${crit.length>3?"…":""}`,"Checklist de conformidade");
+  if (s===4 && !ckOk(o,"rec_prov")) add("warn","Lavrar termo de recebimento provisório em até 15 dias da comunicação da contratada.","Lei 14.133/2021, art. 140, I, a");
+  return A;
+}
+function exigenciasPorte(o){
+  const P=porte(o), L=[];
+  if(P.k==="pequeno") L.push(["Pode ser contratada por dispensa (art. 75, I), vedado o fracionamento: some objetos de mesma natureza no exercício.","art. 75, I e § 1º"]);
+  L.push(["Projeto básico/executivo e orçamento com referência SINAPI/SICRO, independentemente do porte.","art. 23, § 2º; art. 46"]);
+  L.push(["Gestor e fiscal formalmente designados; registro das ocorrências em diário.","art. 117"]);
+  if(P.k!=="pequeno") L.push(["Garantia de até 5% do valor (até 10% se houver alta complexidade técnica e riscos justificados).","arts. 96 a 98"]);
+  if(P.k==="grande"||P.k==="vulto") L.push(["Recomendado: cronograma físico-financeiro com marcos, curva S e comissão de recebimento.","Boa prática / TCU"]);
+  if(P.k==="vulto"){
+    L.push(["Matriz de riscos obrigatória.","art. 22, § 3º"]);
+    L.push(["Possível exigência de seguro-garantia com cláusula de retomada (até 30%).","art. 99"]);
+    L.push(["Programa de integridade da contratada em até 6 meses da assinatura.","art. 25, § 4º"]);
+  }
+  if(o.regime==="integrada"||o.regime==="semi") L.push(["Regime integrado/semi-integrado: anteprojeto e matriz de riscos obrigatórios.","art. 22, § 3º; art. 46"]);
+  if(o.tipo==="reforma_edificio") L.push(["Limite de acréscimos de 50% (reforma de edifício ou equipamento).","art. 125"]);
+  else L.push(["Limite de acréscimos e supressões unilaterais de 25% do valor inicial atualizado.","art. 125"]);
+  if(o.fonte==="convenio_federal") L.push(["Recurso federal: Transferegov, CIPI e regras do Decreto 7.983/2013 para orçamento.","Dec. 11.531/2023; Dec. 10.496/2020"]);
+  return L;
+}
+
+/* ===================== Navegação ===================== */
+function go(view,id){ state.view=view; if(id){state.obraId=id; state.tab="resumo";} if(view!=="obra") { try{history.replaceState(null,"","#"+view);}catch(e){} } render(); window.scrollTo(0,0); }
+function allAlerts(){ return Object.values(state.obras).flatMap(alertas); }
+
+function renderNav(){
+  const crit = allAlerts().filter(a=>a.n==="crit").length;
+  const items=[["painel","Painel"],["obras","Obras"],["alertas","Alertas",crit],["legislacao","Base legal"]];
+  document.getElementById("nav").innerHTML = items.map(([k,t,c])=>`<button class="${state.view===k||(k==="obras"&&state.view==="obra")?"on":""}" data-go="${k}"><span>${t}</span>${c?`<span class="pill">${c}</span>`:""}</button>`).join("");
+}
+function render(){
+  renderNav();
+  const m=document.getElementById("main");
+  const banner = state.dbMode==="local" ? `<div class="banner">Banco compartilhado indisponível nesta visualização: os dados ficam apenas neste navegador.</div>` : state.dbMode==="erro" ? `<div class="banner">O banco não respondeu. Alterações podem não ser salvas.</div>`:"";
+  const v = state.view;
+  m.innerHTML = banner + (v==="obras"?vObras(): v==="obra"?vObra(): v==="alertas"?vAlertas(): v==="legislacao"?vLeis(): vPainel());
+}
+
+/* ===================== Views ===================== */
+function obraRow(o){
+  const f=financeiro(o), p=prazo(o), P=porte(o), A=alertas(o);
+  const c=A.filter(a=>a.n==="crit").length, w=A.filter(a=>a.n==="warn").length;
+  return `<tr class="click" data-open="${esc(o.id)}">
+    <td><b>${esc(o.nome||"Sem nome")}</b><div class="mini">${esc(o.municipio||"")}${o.uf?"/"+esc(o.uf):""} · ${esc(lbl(TIPOS,o.tipo))}</div></td>
+    <td><span class="tag ${P.c}">${P.t}</span></td>
+    <td><span class="tag t-mute">${esc(stLabel(o.status))}</span></td>
+    <td class="num">${brl(f.atual)}</td>
+    <td style="min-width:130px"><div class="bar" title="Físico ${pct(f.fisico)} · previsto ${p.previsto!=null?pct(p.previsto):"—"}"><i style="width:${Math.min(100,f.fisico)}%"></i>${p.previsto!=null?`<b style="left:${Math.min(99,p.previsto)}%"></b>`:""}</div><div class="mini">${pct(f.fisico)} físico${p.previsto!=null?` · ${pct(p.previsto)} prev.`:""}</div></td>
+    <td>${c?`<span class="tag t-crit">${c} crít.</span> `:""}${w?`<span class="tag t-warn">${w} at.</span>`:""}${!c&&!w?`<span class="tag t-ok">OK</span>`:""}</td>
+  </tr>`;
+}
+function obrasTable(list){
+  if(!list.length) return `<div class="empty">Nenhuma obra cadastrada.<div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" data-act="nova">Cadastrar obra</button><button class="btn" data-act="exemplo">Carregar obra de exemplo</button></div></div>`;
+  return `<table><thead><tr><th>Obra</th><th>Porte</th><th>Situação</th><th class="num">Valor atualizado</th><th>Avanço físico</th><th>Alertas</th></tr></thead><tbody>${list.map(obraRow).join("")}</tbody></table>`;
+}
+function sortedObras(){ return Object.values(state.obras).sort((a,b)=>(b.atualizadoEm||"").localeCompare(a.atualizadoEm||"")); }
+
+function vPainel(){
+  const L=sortedObras(); const fs=L.map(financeiro); const A=allAlerts();
+  const tot=fs.reduce((s,f)=>s+f.atual,0), med=fs.reduce((s,f)=>s+f.medido,0);
+  const exec=L.filter(o=>o.status==="execucao").length, par=L.filter(o=>o.status==="paralisada").length;
+  const crit=A.filter(a=>a.n==="crit");
+  const portes={pequeno:0,medio:0,grande:0,vulto:0}; L.forEach(o=>portes[porte(o).k]++);
+  return `<div class="row"><div><h1>Painel de obras</h1><p class="sub">Visão consolidada da carteira — valores de referência ${PARAM.ano} pelo ${PARAM.decreto}.</p></div><div class="spacer"></div><button class="btn pri" data-act="nova">+ Nova obra</button></div>
+  <div class="grid k4">
+    <div class="card kpi"><div class="l">Obras</div><div class="v">${L.length}</div><div class="h">${exec} em execução · ${par} paralisada(s)</div></div>
+    <div class="card kpi"><div class="l">Valor atualizado</div><div class="v">${brl(tot)}</div><div class="h">contratado + aditivos</div></div>
+    <div class="card kpi"><div class="l">Medido</div><div class="v">${brl(med)}</div><div class="h">${tot?pct(med/tot*100):"0%"} da carteira</div></div>
+    <div class="card kpi"><div class="l">Alertas críticos</div><div class="v" style="color:${crit.length?"var(--crit)":"var(--ok)"}">${crit.length}</div><div class="h">${A.length-crit.length} de atenção</div></div>
+  </div>
+  <div class="grid" style="grid-template-columns:2fr 1fr;margin-top:14px">
+    <div class="card"><h2>Carteira</h2>${obrasTable(L)}</div>
+    <div class="card"><h2>Prioridades</h2>${crit.length?crit.slice(0,8).map(alertHtml).join(""):`<p class="mini">Nenhum alerta crítico.</p>`}
+      <h3 style="margin-top:16px">Distribuição por porte</h3>
+      <div class="mini">Pequeno ${portes.pequeno} · Médio ${portes.medio} · Grande ${portes.grande} · Grande vulto ${portes.vulto}</div></div>
+  </div>`;
+}
+function alertHtml(a,showObra=true){
+  const ic={crit:"!",warn:"▲",info:"i"}[a.n];
+  return `<div class="alert ${a.n}"><div class="ic">${ic}</div><div>${showObra?`<div class="ob">${esc(a.obra.nome||"Obra")}</div>`:""}<div>${esc(a.m)}</div><div class="base">${esc(a.b)}</div></div></div>`;
+}
+function vObras(){
+  return `<div class="row"><div><h1>Obras</h1><p class="sub">Clique em uma obra para acompanhar contrato, conformidade, medições, aditivos e diário.</p></div><div class="spacer"></div><button class="btn" data-act="exemplo">Obra de exemplo</button><button class="btn pri" data-act="nova">+ Nova obra</button></div>
+  <div class="card">${obrasTable(sortedObras())}</div>`;
+}
+function vAlertas(){
+  const A=allAlerts(); const ord={crit:0,warn:1,info:2}; A.sort((a,b)=>ord[a.n]-ord[b.n]);
+  return `<h1>Alertas</h1><p class="sub">Gerados automaticamente a partir de prazos, valores, aditivos, medições e do checklist legal de cada obra.</p>
+  <div class="card">${A.length?A.map(a=>`<div data-open="${esc(a.obra.id)}" style="cursor:pointer">${alertHtml(a)}</div>`).join(""):`<div class="empty">Nenhum alerta. Tudo em conformidade.</div>`}</div>`;
+}
+
+function vObra(){
+  const o=state.obras[state.obraId]; if(!o) return `<div class="empty">Obra não encontrada. <button class="btn" data-go="obras">Voltar</button></div>`;
+  const P=porte(o);
+  const tabs=[["resumo","Resumo"],["conformidade","Conformidade legal"],["medicoes","Medições"],["aditivos","Aditivos"],["diario","Diário de obra"],["dados","Dados do contrato"]];
+  const body = {resumo:tResumo,conformidade:tConf,medicoes:tMed,aditivos:tAd,diario:tDiario,dados:tDados}[state.tab](o);
+  return `<div class="row"><button class="btn sm" data-go="obras">← Obras</button></div>
+  <div class="row" style="margin-top:10px"><div><h1>${esc(o.nome||"Sem nome")}</h1>
+  <div class="row"><span class="tag ${P.c}">${P.t}</span><span class="tag t-mute">${esc(stLabel(o.status))}</span><span class="mini">${esc(o.orgao||"")} · ${esc(o.municipio||"")}${o.uf?"/"+esc(o.uf):""} · Contrato ${esc(o.contratoNum||"—")}</span></div></div>
+  <div class="spacer"></div>
+  <label style="flex-direction:row;align-items:center;gap:8px">Situação <select data-status>${STATUS.map(s=>`<option value="${s[0]}" ${o.status===s[0]?"selected":""}>${s[1]}</option>`).join("")}</select></label></div>
+  <div class="tabs">${tabs.map(([k,t])=>`<button class="${state.tab===k?"on":""}" data-tab="${k}">${t}</button>`).join("")}</div>${body}`;
+}
+function curva(o,f,p){
+  if(!p.ini||!p.total) return `<p class="mini">Informe a data da ordem de serviço e o prazo para ver a curva de avanço.</p>`;
+  const W=560,H=200,pl=36,pb=24,pt=10,pr=10; const X=d=>pl+(Math.max(0,Math.min(p.total,diffDays(p.ini,d)))/p.total)*(W-pl-pr); const Y=v=>pt+(1-v/100)*(H-pt-pb);
+  const pts=[[p.ini,0],...f.meds.filter(m=>m.fim).map(m=>[D(m.fim),numIn(m.fisico)])];
+  const fin=[[p.ini,0]]; let ac=0; f.meds.filter(m=>m.fim).forEach(m=>{ac+=numIn(m.valor); fin.push([D(m.fim), f.atual? ac/f.atual*100:0]);});
+  const path=a=>a.map((q,i)=>(i?"L":"M")+X(q[0]).toFixed(1)+" "+Y(q[1]).toFixed(1)).join(" ");
+  const tx=X(today());
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Curva de avanço">
+    ${[0,25,50,75,100].map(v=>`<line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e5e8e5"/><text x="${pl-6}" y="${Y(v)+4}" font-size="10" text-anchor="end" fill="#6b7671">${v}%</text>`).join("")}
+    <line x1="${X(p.ini)}" y1="${Y(0)}" x2="${X(p.fim)}" y2="${Y(100)}" stroke="#c8862a" stroke-dasharray="5 4" stroke-width="1.5"/>
+    <path d="${path(fin)}" fill="none" stroke="#7aa5c9" stroke-width="2"/>
+    <path d="${path(pts)}" fill="none" stroke="#1f4d3f" stroke-width="2.5"/>
+    ${pts.slice(1).map(q=>`<circle cx="${X(q[0])}" cy="${Y(q[1])}" r="3.5" fill="#1f4d3f"/>`).join("")}
+    <line x1="${tx}" x2="${tx}" y1="${pt}" y2="${H-pb}" stroke="#9aa39f" stroke-width="1"/>
+    <text x="${pl}" y="${H-6}" font-size="10" fill="#6b7671">${fmtD(p.ini)}</text><text x="${W-pr}" y="${H-6}" font-size="10" text-anchor="end" fill="#6b7671">${fmtD(p.fim)}</text>
+  </svg><div class="mini"><span style="color:#1f4d3f">━ físico medido</span> · <span style="color:#7aa5c9">━ financeiro</span> · <span style="color:#c8862a">╌ previsto (linear)</span> · │ hoje</div>`;
+}
+function tResumo(o){
+  const f=financeiro(o), p=prazo(o), A=alertas(o), c=conformidade(o);
+  return `<div class="grid k4">
+    <div class="card kpi"><div class="l">Valor atualizado</div><div class="v">${brl(f.atual)}</div><div class="h">inicial ${brl(f.orig)}</div></div>
+    <div class="card kpi"><div class="l">Medido / saldo</div><div class="v">${pct(f.pFin)}</div><div class="h">${brl(f.medido)} · saldo ${brl(f.saldo)}</div></div>
+    <div class="card kpi"><div class="l">Prazo</div><div class="v">${p.restante==null?"—":p.restante<0?`<span style="color:var(--crit)">${p.restante}d</span>`:p.restante+"d"}</div><div class="h">término ${fmtD(p.fim)}${p.extra?` · +${p.extra}d aditados`:""}</div></div>
+    <div class="card kpi"><div class="l">Conformidade</div><div class="v">${c.ok}/${c.total}</div><div class="h">${c.atrasados.length} pendência(s) de fases anteriores</div></div>
+  </div>
+  <div class="grid k2" style="margin-top:14px">
+    <div class="card"><h2>Alertas desta obra</h2>${A.length?A.map(a=>alertHtml(a,false)).join(""):`<p class="mini">Sem alertas.</p>`}</div>
+    <div class="card"><h2>Curva de avanço</h2>${curva(o,f,p)}
+      <h3 style="margin-top:16px">Aditivos (art. 125)</h3>
+      <div class="mini" style="margin-bottom:4px">Acréscimos ${pct(f.pAcr)} de ${f.limite}% · Supressões ${pct(f.pSup)} de 25% (calculados separadamente, sem compensação)</div>
+      <div class="bar"><i style="width:${Math.min(100,f.pAcr/f.limite*100)}%;background:${f.pAcr>f.limite?"var(--crit)":f.pAcr>f.limite*.8?"var(--accent)":"var(--brand-2)"}"></i></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px"><h2>Exigências pelo porte e características — ${porte(o).t}</h2><p class="mini">${porte(o).d}</p>
+    <ul class="req">${exigenciasPorte(o).map(([t,b])=>`<li>${esc(t)} <span class="base">— ${esc(b)}</span></li>`).join("")}</ul></div>`;
+}
+function tConf(o){
+  const s=stIdx(o.status);
+  return `<p class="sub">Marque cada exigência quando estiver comprovada no processo. Itens esmaecidos não se aplicam a esta obra (porte, regime, fonte ou licenciamento). Pendências obrigatórias de fases já ultrapassadas geram alerta crítico.</p>`+
+  FASES.map((nome,fi)=>{
+    const its=CHECK.filter(i=>i.f===fi); const ap=its.filter(i=>aplica(i,o)); const ok=ap.filter(i=>ckOk(o,i.k)).length;
+    const st = fi<s ? (ok===ap.length?"t-ok":"t-crit") : fi===s ? "t-info" : "t-mute";
+    return `<div class="card phase"><h3>${fi+1}. ${nome} <span class="tag ${st}">${ok}/${ap.length}</span></h3>${its.map(i=>{
+      const na=!aplica(i,o); const e=(o.checklist||{})[i.k]||{};
+      return `<div class="ck ${na?"na":""}"><input type="checkbox" data-ck="${i.k}" ${e.ok?"checked":""} ${na?"disabled":""}>
+        <div><div class="t">${esc(i.t)} ${i.c&&!na?`<span class="tag t-warn">obrigatório</span>`:""}</div><div class="b">${esc(baseTxt(i,o))}</div>
+        ${!na?`<input placeholder="Nº do documento / processo / observação" data-ckobs="${i.k}" value="${esc(e.obs||"")}" style="margin-top:6px;width:100%;font-size:12.5px;padding:5px 8px">`:""}</div>
+        <div class="mini">${e.ok&&e.data?fmtD(D(e.data)):""}</div></div>`;}).join("")}</div>`;
+  }).join("");
+}
+function tMed(o){
+  const f=financeiro(o);
+  return `<div class="card"><h2>Nova medição</h2>
+  <form data-form="medicao" class="form">
+    <label>Nº da medição<input name="num" value="${f.meds.length+1}"></label>
+    <label>Período — início<input type="date" name="ini" required></label>
+    <label>Período — fim<input type="date" name="fim" required></label>
+    <label>% físico acumulado<input name="fisico" inputmode="decimal" required placeholder="ex.: 35,5"></label>
+    <label>Valor medido no período (R$)<input name="valor" inputmode="decimal" required placeholder="ex.: 125000,00"></label>
+    <label>Atesto do fiscal (data)<input type="date" name="atesto"></label>
+    <label class="full">Observações / glosas<textarea name="obs"></textarea></label>
+    <div class="full row"><button class="btn pri">Registrar medição</button><span class="mini">Saldo contratual: ${brl(f.saldo)}</span></div>
+  </form></div>
+  <div class="card" style="margin-top:14px"><h2>Boletins de medição</h2>${f.meds.length?`<table><thead><tr><th>Nº</th><th>Período</th><th class="num">% físico acum.</th><th class="num">Valor</th><th class="num">Acumulado</th><th>Atesto</th><th></th></tr></thead><tbody>${(()=>{let ac=0;return f.meds.map(m=>{ac+=numIn(m.valor);return `<tr><td>${esc(m.num)}</td><td>${fmtD(D(m.ini))} – ${fmtD(D(m.fim))}${m.obs?`<div class="mini">${esc(m.obs)}</div>`:""}</td><td class="num">${pct(numIn(m.fisico))}</td><td class="num">${brl(m.valor)}</td><td class="num">${brl(ac)}<div class="mini">${f.atual?pct(ac/f.atual*100):""}</div></td><td>${m.atesto?fmtD(D(m.atesto)):`<span class="tag t-warn">pendente</span>`}</td><td><button class="btn sm danger" data-del="medicoes:${m.id}">Excluir</button></td></tr>`;}).join("");})()}</tbody></table>`:`<p class="mini">Nenhuma medição registrada.</p>`}</div>`;
+}
+function tAd(o){
+  const f=financeiro(o); const ad=(o.aditivos||[]).slice().sort((a,b)=>(a.data||"").localeCompare(b.data||""));
+  const tp={acrescimo:"Acréscimo de valor",supressao:"Supressão de valor",prazo:"Prorrogação de prazo",reajuste:"Reajuste / repactuação (apostilamento)"};
+  return `<div class="grid k2"><div class="card"><h2>Novo termo</h2>
+  <form data-form="aditivo" class="form" style="grid-template-columns:1fr 1fr">
+    <label>Tipo<select name="tipo">${Object.entries(tp).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></label>
+    <label>Nº do termo<input name="num" placeholder="ex.: 1º TA"></label>
+    <label>Valor (R$)<input name="valor" inputmode="decimal" placeholder="0,00"></label>
+    <label>Dias (prorrogação)<input name="dias" inputmode="numeric" placeholder="0"></label>
+    <label>Data de assinatura<input type="date" name="data" required></label>
+    <label>Parecer jurídico<select name="parecer"><option value="sim">Sim</option><option value="nao">Não</option></select></label>
+    <label class="full">Justificativa técnica<textarea name="just" required placeholder="Fato superveniente, alteração de projeto, quantitativos…"></textarea></label>
+    <div class="full"><button class="btn pri">Registrar termo</button></div>
+  </form></div>
+  <div class="card"><h2>Limites do art. 125</h2>
+    <p class="mini">Tipo de objeto: <b>${esc(lbl(TIPOS,o.tipo))}</b> → limite de acréscimos de <b>${f.limite}%</b>; supressões até 25%. Os percentuais incidem sobre o valor inicial atualizado e são calculados separadamente.</p>
+    <table><tbody>
+      <tr><td>Valor inicial</td><td class="num">${brl(f.orig)}</td></tr>
+      <tr><td>Acréscimos</td><td class="num">${brl(f.acr)} <span class="tag ${f.pAcr>f.limite?"t-crit":f.pAcr>f.limite*.8?"t-warn":"t-ok"}">${pct(f.pAcr)}</span></td></tr>
+      <tr><td>Supressões</td><td class="num">${brl(f.sup)} <span class="tag ${f.pSup>25?"t-crit":"t-ok"}">${pct(f.pSup)}</span></td></tr>
+      <tr><td>Reajustes (não contam no limite)</td><td class="num">${brl(f.reaj)}</td></tr>
+      <tr><td><b>Valor atualizado</b></td><td class="num"><b>${brl(f.atual)}</b></td></tr>
+      <tr><td>Margem restante para acréscimos</td><td class="num">${brl(Math.max(0,f.orig*f.limite/100-f.acr))}</td></tr>
+    </tbody></table></div></div>
+  <div class="card" style="margin-top:14px"><h2>Histórico</h2>${ad.length?`<table><thead><tr><th>Data</th><th>Termo</th><th>Tipo</th><th class="num">Valor</th><th class="num">Dias</th><th>Justificativa</th><th></th></tr></thead><tbody>${ad.map(a=>`<tr><td>${fmtD(D(a.data))}</td><td>${esc(a.num)}</td><td>${tp[a.tipo]}${a.parecer==="nao"?` <span class="tag t-crit">sem parecer</span>`:""}</td><td class="num">${numIn(a.valor)?brl(a.valor):"—"}</td><td class="num">${numIn(a.dias)||"—"}</td><td>${esc(a.just)}</td><td><button class="btn sm danger" data-del="aditivos:${a.id}">Excluir</button></td></tr>`).join("")}</tbody></table>`:`<p class="mini">Nenhum termo registrado.</p>`}</div>`;
+}
+function tDiario(o){
+  const d=(o.diario||[]).slice().sort((a,b)=>(b.data||"").localeCompare(a.data||""));
+  return `<div class="card"><h2>Novo registro</h2><form data-form="diario" class="form">
+    <label>Data<input type="date" name="data" value="${iso(today())}" required></label>
+    <label>Clima<select name="clima"><option>Bom</option><option>Nublado</option><option>Chuva leve</option><option>Chuva forte (impraticável)</option></select></label>
+    <label>Efetivo (trabalhadores)<input name="efetivo" inputmode="numeric"></label>
+    <label class="full">Serviços executados<textarea name="servicos"></textarea></label>
+    <label class="two">Ocorrências / determinações do fiscal<textarea name="ocorr"></textarea></label>
+    <label>Responsável pelo registro<input name="resp" value="${esc(o.fiscal||"")}"></label>
+    <div class="full"><button class="btn pri">Registrar no diário</button></div></form></div>
+  <div class="card" style="margin-top:14px"><h2>Registros (${d.length})</h2>${d.length?d.map(x=>`<div style="padding:10px 0;border-bottom:1px solid var(--line)"><div class="row"><b>${fmtD(D(x.data))}</b><span class="tag ${/forte/.test(x.clima)?"t-warn":"t-mute"}">${esc(x.clima)}</span><span class="mini">Efetivo: ${esc(x.efetivo||"—")} · ${esc(x.resp||"")}</span><span class="spacer"></span><button class="btn sm danger" data-del="diario:${x.id}">Excluir</button></div>${x.servicos?`<div style="margin-top:4px">${esc(x.servicos)}</div>`:""}${x.ocorr?`<div class="mini" style="margin-top:4px"><b>Ocorrências:</b> ${esc(x.ocorr)}</div>`:""}</div>`).join(""):`<p class="mini">Nenhum registro.</p>`}</div>`;
+}
+function obraForm(o){
+  const sel=(n,arr,v)=>`<select name="${n}">${arr.map(([k,t])=>`<option value="${k}" ${v===k?"selected":""}>${t}</option>`).join("")}</select>`;
+  const i=(n,l,t="text",cls="")=>`<label class="${cls}">${l}<input type="${t}" name="${n}" value="${esc(o[n]||"")}"></label>`;
+  return `<fieldset><legend>Identificação</legend><div class="form">
+    ${i("nome","Nome da obra *","text","two")}${i("orgao","Órgão / secretaria")}
+    ${i("municipio","Município")}<label>UF<input name="uf" maxlength="2" value="${esc(o.uf||"")}"></label>
+    <label>Esfera${sel("esfera",ESFERAS,o.esfera)}</label>
+    <label>Tipo de obra${sel("tipo",TIPOS,o.tipo)}</label>
+    <label>Fonte de recursos${sel("fonte",FONTES,o.fonte)}</label>
+    <label>Licenciamento ambiental<select name="licenca"><option value="verificar" ${o.licenca!=="sim"&&o.licenca!=="nao"?"selected":""}>A verificar</option><option value="sim" ${o.licenca==="sim"?"selected":""}>Exigível</option><option value="nao" ${o.licenca==="nao"?"selected":""}>Dispensado (documentado)</option></select></label>
+    <label class="full">Objeto<textarea name="objeto">${esc(o.objeto||"")}</textarea></label></div></fieldset>
+  <fieldset><legend>Contratação</legend><div class="form">
+    <label>Modalidade${sel("modalidade",MODALIDADES,o.modalidade)}</label>
+    <label>Regime de execução (art. 46)${sel("regime",REGIMES,o.regime)}</label>
+    ${i("processo","Nº do processo")}
+    ${i("valorEstimado","Valor estimado (R$)")}${i("valorContratado","Valor contratado (R$)")}${i("bdi","BDI (%)")}
+    ${i("contratoNum","Nº do contrato")}${i("contratada","Contratada")}${i("cnpj","CNPJ")}
+    ${i("dataAssinatura","Data de assinatura","date")}${i("dataOS","Data da ordem de serviço","date")}${i("prazoDias","Prazo de execução (dias)")}
+    ${i("garantiaTipo","Garantia — modalidade")}${i("garantiaValor","Garantia — valor (R$)")}${i("garantiaVenc","Garantia — vencimento","date")}
+    ${i("dataParalisacao","Data de paralisação (se houver)","date")}</div></fieldset>
+  <fieldset><legend>Responsáveis</legend><div class="form">
+    ${i("gestor","Gestor do contrato")}${i("fiscal","Fiscal técnico")}${i("portaria","Portaria de designação")}
+    ${i("rtContratada","Responsável técnico da contratada")}${i("artExec","Nº ART/RRT de execução")}${i("artFisc","Nº ART/RRT de fiscalização")}</div></fieldset>`;
+}
+function tDados(o){
+  return `<form data-form="dados">${obraForm(o)}<div class="row"><button class="btn pri">Salvar alterações</button><span class="spacer"></span><button type="button" class="btn danger" data-act="excluir">Excluir obra</button></div></form>`;
+}
+function vLeis(){
+  const L=[
+    ["Federal","Lei nº 14.133/2021","Licitações e contratos: planejamento (ETP, projetos), regimes de execução (art. 46), alterações e limites (arts. 124–125), fiscalização (art. 117), pagamento (art. 145), recebimento (art. 140), obra paralisada (art. 115)."],
+    ["Federal",PARAM.decreto,`Valores ${PARAM.ano}: dispensa para obras e serviços de engenharia ${brl(PARAM.dispensaObras)}; grande vulto ${brl(PARAM.grandeVulto)}. Atualizado anualmente pelo IPCA-E (art. 182).`],
+    ["Federal","Decreto nº 7.983/2013","Orçamento de referência de obras com recursos da União: SINAPI, SICRO, BDI."],
+    ["Federal","LC nº 101/2000 (LRF) e Lei nº 4.320/1964","Adequação orçamentária e financeira, estimativa de impacto (art. 16) e prioridade a obras em andamento (art. 45)."],
+    ["Federal","Decreto nº 11.531/2023","Convênios e contratos de repasse com recursos da União (Transferegov)."],
+    ["Federal","Decreto nº 10.496/2020","Cadastro Integrado de Projetos de Investimento (CIPI)."],
+    ["Federal","Lei nº 6.496/1977 e Lei nº 12.378/2010","ART (CREA) e RRT (CAU) para projeto, execução e fiscalização."],
+    ["Federal","Lei nº 6.938/1981, LC nº 140/2011 e Res. CONAMA 237/1997","Licenciamento ambiental (LP, LI, LO) e competências dos entes."],
+    ["Federal","Lei nº 13.146/2015 e ABNT NBR 9050","Acessibilidade em edificações e espaços públicos."],
+    ["Federal","NR-18 / NR-01","Segurança e saúde no trabalho na indústria da construção."],
+    ["Federal","IN RFB nº 2.061/2021","Cadastro Nacional de Obras (CNO)."],
+    ["Estadual","Tribunal de Contas do Estado","Remessas e prestação de contas. No Espírito Santo: TCE-ES, sistema CidadES (IN TCE-ES nº 68/2020). Complementar com a legislação estadual de licitações e licenciamento do órgão ambiental estadual."],
+    ["Municipal","Código de Obras, Plano Diretor e Lei nº 10.257/2001","Alvará de construção, uso do solo, habite-se e regulamentos municipais da Lei 14.133 (fiscalização, recebimento, sanções)."],
+  ];
+  return `<h1>Base legal</h1><p class="sub">Normas usadas pelas regras de alerta e pelo checklist. Confirme sempre a redação vigente e os regulamentos do seu ente.</p>
+  <div class="card">${L.map(([e,t,d])=>`<div class="law"><span class="tag ${e==="Federal"?"t-info":e==="Estadual"?"t-warn":"t-ok"}">${e}</span> <b style="display:inline">${esc(t)}</b><div class="mini" style="margin-top:3px">${esc(d)}</div></div>`).join("")}</div>
+  <div class="card" style="margin-top:14px"><h2>Parâmetros de porte usados</h2><table><tbody>
+    <tr><td>Pequeno porte</td><td>até ${brl(PARAM.dispensaObras)} (limite de dispensa, art. 75, I)</td></tr>
+    <tr><td>Médio porte</td><td>acima da dispensa até ${brl(PARAM.faixaMedia)} (parâmetro interno, ajustável)</td></tr>
+    <tr><td>Grande porte</td><td>acima de ${brl(PARAM.faixaMedia)}</td></tr>
+    <tr><td>Grande vulto</td><td>a partir de ${brl(PARAM.grandeVulto)} (art. 6º, XXII)</td></tr></tbody></table></div>`;
+}
+
+/* ===================== Modais ===================== */
+function modal(html){ document.getElementById("modal").innerHTML=`<div class="modal-bg" data-close><div class="modal">${html}</div></div>`; }
+function closeModal(){ document.getElementById("modal").innerHTML=""; }
+function formObj(form){ const o={}; new FormData(form).forEach((v,k)=>o[k]=typeof v==="string"?v.trim():v); return o; }
+
+function exemplo(){
+  const t=today(), os=addDays(t,-120);
+  const o={id:uid(),nome:"UBS Bairro Novo — construção",orgao:"Secretaria Municipal de Obras",municipio:"Vila Exemplo",uf:"ES",esfera:"municipal",tipo:"edificacao",fonte:"convenio_federal",licenca:"nao",
+    objeto:"Construção de Unidade Básica de Saúde porte II, com 420 m².",modalidade:"concorrencia",regime:"unitario",processo:"2026/000123",valorEstimado:"2480000",valorContratado:"2315400",bdi:"24,5",
+    contratoNum:"045/2026",contratada:"Construtora Modelo Ltda.",cnpj:"00.000.000/0001-00",dataAssinatura:iso(addDays(os,-12)),dataOS:iso(os),prazoDias:"300",
+    garantiaTipo:"Seguro-garantia",garantiaValor:"115770",garantiaVenc:iso(addDays(t,20)),gestor:"Ana Ribeiro",fiscal:"Eng. Carlos Mendes",portaria:"Portaria SEMOB 12/2026",rtContratada:"Eng. Paula Souza",artExec:"ES20260012345",artFisc:"",
+    status:"execucao",checklist:{},medicoes:[],aditivos:[],diario:[],criadoEm:new Date().toISOString()};
+  ["dfd","etp","pb","pe","orc","art_proj","terreno","dotacao","alvara","acess","edital","parecer","pncp_edital","homolog","contrato","pncp_contrato","garantia","design","art_exec","os","placa","transferegov"].forEach(k=>o.checklist[k]={ok:true,data:iso(os)});
+  const m=[[30,6,138000],[60,14,190500],[90,22,181200]]; m.forEach((x,i)=>o.medicoes.push({id:uid(),num:String(i+1),ini:iso(addDays(os,x[0]-30)),fim:iso(addDays(os,x[0])),fisico:String(x[1]),valor:String(x[2]),atesto:iso(addDays(os,x[0]+3)),obs:""}));
+  o.aditivos.push({id:uid(),tipo:"acrescimo",num:"1º TA",valor:"312000",dias:"",data:iso(addDays(os,75)),parecer:"sim",just:"Contenção de talude não prevista no projeto básico."});
+  o.diario.push({id:uid(),data:iso(addDays(t,-10)),clima:"Bom",efetivo:"18",servicos:"Alvenaria do bloco B e concretagem de vigas.",ocorr:"Solicitado reforço de equipe para recuperar cronograma.",resp:"Eng. Carlos Mendes"});
+  persist(o); go("obra",o.id); toast("Obra de exemplo criada.");
+}
+
+/* ===================== Eventos ===================== */
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]"); if(g){ go(g.dataset.go); return; }
+  const op=e.target.closest("[data-open]"); if(op){ go("obra",op.dataset.open); return; }
+  const tb=e.target.closest("[data-tab]"); if(tb){ state.tab=tb.dataset.tab; render(); return; }
+  if(e.target.matches("[data-close]")){ closeModal(); return; }
+  const act=e.target.closest("[data-act]");
+  if(act){
+    const a=act.dataset.act;
+    if(a==="nova") modal(`<h2>Nova obra</h2><form data-form="nova">${obraForm({status:"planejamento",tipo:"edificacao",fonte:"proprio",esfera:"municipal",modalidade:"concorrencia",regime:"unitario"})}<div class="row"><button class="btn pri">Cadastrar</button><button type="button" class="btn" data-act="fechar">Cancelar</button></div></form>`);
+    if(a==="fechar") closeModal();
+    if(a==="exemplo") exemplo();
+    if(a==="excluir"){ const o=state.obras[state.obraId]; modal(`<h2>Excluir obra?</h2><p>“${esc(o.nome)}” e todos os seus registros serão removidos.</p><div class="row"><button class="btn pri" style="background:var(--crit);border-color:var(--crit)" data-act="confexcluir">Excluir</button><button class="btn" data-act="fechar">Cancelar</button></div>`); }
+    if(a==="confexcluir"){ closeModal(); removeObra(state.obraId); }
+    return;
+  }
+  const del=e.target.closest("[data-del]");
+  if(del){ const [col,id]=del.dataset.del.split(":"); const o=JSON.parse(JSON.stringify(state.obras[state.obraId])); o[col]=(o[col]||[]).filter(x=>x.id!==id); persist(o); }
+});
+document.addEventListener("change",e=>{
+  const o0=state.obras[state.obraId];
+  if(e.target.matches("[data-ck]") && o0){ const o=JSON.parse(JSON.stringify(o0)); o.checklist=o.checklist||{}; const k=e.target.dataset.ck; o.checklist[k]=Object.assign(o.checklist[k]||{},{ok:e.target.checked,data:e.target.checked?iso(today()):""}); persist(o); }
+  if(e.target.matches("[data-ckobs]") && o0){ const o=JSON.parse(JSON.stringify(o0)); o.checklist=o.checklist||{}; const k=e.target.dataset.ckobs; o.checklist[k]=Object.assign(o.checklist[k]||{},{obs:e.target.value.trim()}); persist(o); }
+  if(e.target.matches("[data-status]") && o0){ const o=JSON.parse(JSON.stringify(o0)); o.status=e.target.value; if(o.status==="paralisada"&&!o.dataParalisacao) o.dataParalisacao=iso(today()); persist(o); }
+});
+document.addEventListener("submit",e=>{
+  e.preventDefault(); const form=e.target; const t=form.dataset.form; const v=formObj(form);
+  if(t==="nova"){ if(!v.nome){toast("Informe o nome da obra.");return;} const o=Object.assign({id:uid(),status:"planejamento",checklist:{},medicoes:[],aditivos:[],diario:[],criadoEm:new Date().toISOString()},v); closeModal(); persist(o); go("obra",o.id); toast("Obra cadastrada."); return; }
+  const o=JSON.parse(JSON.stringify(state.obras[state.obraId]||{})); if(!o.id) return;
+  if(t==="dados"){ if(!v.nome){toast("Informe o nome da obra.");return;} Object.assign(o,v); persist(o); toast("Dados salvos."); return; }
+  if(t==="medicao"){
+    const f=financeiro(o); const fis=numIn(v.fisico), val=numIn(v.valor);
+    if(fis<f.fisico){ toast(`% físico acumulado não pode ser menor que o anterior (${pct(f.fisico)}).`); return; }
+    if(fis>100){ toast("% físico acumulado acima de 100%."); return; }
+    if(v.fim<v.ini){ toast("Período inválido."); return; }
+    o.medicoes=(o.medicoes||[]).concat({id:uid(),...v}); persist(o);
+    if(f.medido+val>f.atual) toast("Atenção: medição ultrapassa o saldo contratual."); else toast("Medição registrada.");
+    return;
+  }
+  if(t==="aditivo"){ if(v.tipo==="prazo"&&!numIn(v.dias)){toast("Informe os dias da prorrogação.");return;} if(v.tipo!=="prazo"&&!numIn(v.valor)){toast("Informe o valor.");return;} o.aditivos=(o.aditivos||[]).concat({id:uid(),...v}); persist(o); toast("Termo registrado."); return; }
+  if(t==="diario"){ o.diario=(o.diario||[]).concat({id:uid(),...v}); persist(o); toast("Registro incluído no diário."); return; }
+});
+window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(["painel","obras","alertas","legislacao"].includes(h)&&h!==state.view){ state.view=h; render(); } });
+if(!["painel","obras","alertas","legislacao"].includes(state.view)) state.view="painel";
+render(); initDb();
+</script>
+</body>
+</html>
