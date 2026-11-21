@@ -1,4 +1,6 @@
-# Regras de negócio — SCOP v0.1
+# Regras de negócio — SCOP
+
+> Implementação: [`packages/regras`](../packages/regras/src) (funções puras, testadas). Este documento descreve o comportamento esperado.
 
 ## 1. Situação da obra e fases
 
