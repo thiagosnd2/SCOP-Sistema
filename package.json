@@ -1,0 +1,22 @@
+{
+  "name": "scop-sistema",
+  "private": true,
+  "version": "1.0.0-alpha.0",
+  "description": "SCOP — Sistema de Controle de Obras Públicas",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @scop/regras && npm run build -w @scop/api && npm run build -w @scop/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "dev:api": "npm run dev -w @scop/api",
+    "dev:web": "npm run dev -w @scop/web",
+    "db:migrate": "npm run db:migrate -w @scop/api",
+    "db:seed": "npm run db:seed -w @scop/api"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

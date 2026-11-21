@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: scop
+          POSTGRES_PASSWORD: scop
+          POSTGRES_DB: scop_teste
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U scop"
+          --health-interval 5s
+          --health-retries 10
+    env:
+      DATABASE_URL_TESTE: postgresql://scop:scop@localhost:5432/scop_teste
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build das regras
+        run: npm run build -w @scop/regras
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Testes (regras + API contra PostgreSQL)
+        run: npm test
+      - name: Build da API e do frontend
+        run: npm run build
